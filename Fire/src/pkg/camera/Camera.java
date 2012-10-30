@@ -1,5 +1,7 @@
 package pkg.camera;
 
+import pkg.fire.MainMenu;
+import pkg.fire.PhotoMenu;
 import pkg.fire.R;
 import pkg.fire.R.layout;
 import pkg.fire.R.menu;
@@ -46,6 +48,9 @@ public class Camera extends Activity implements View.OnClickListener {
 	public void onClick(View v) {
 		switch(v.getId()){
 		case R.id.done_btn:
+			Intent cropIntent = new Intent(Camera.this, CropPic.class);
+			cropIntent.putExtra("photo", bmp);
+			startActivity(cropIntent);
 			break;
 		case R.id.retake_btn:
 			Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
