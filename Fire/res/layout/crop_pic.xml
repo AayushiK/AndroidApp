@@ -5,17 +5,14 @@
     android:orientation="vertical" >
 
     <LinearLayout
+        android:id="@+id/cropViewLayout"
         android:layout_width="match_parent"
         android:layout_height="435dp" >
-
-        <SurfaceView
-            android:id="@+id/cropView"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent" />
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/cropBtnLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
