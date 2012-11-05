@@ -11,9 +11,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -39,13 +41,7 @@ public class CropPic extends Activity implements OnTouchListener{
         Panel sv = new Panel(this);
         sv.setOnTouchListener(this);
         layout.addView(sv, params);
-       // setContentView(new Panel(this));
-    
-        /*  setContentView(R.layout.crop_pic);
-        sv = (CropSurface) findViewById(R.id.cropView);
-        cropDone = (Button) findViewById(R.id.cropDoneBtn);
-        cropDone.setOnTouchListener(this);
-    */    
+          
         if(getIntent().getExtras()!=null){
         //	photo  = (Bitmap) getIntent().getParcelableExtra("photo");
         	imgUri = (Uri) getIntent().getParcelableExtra("photoUri");
@@ -75,15 +71,155 @@ public class CropPic extends Activity implements OnTouchListener{
 		return false;
 	}
 	
-	class Panel extends View {
+	/*** PANEL CLASS ***/
+	
+	class Panel extends SurfaceView implements SurfaceHolder.Callback {
+		
+		PanelThread thread;
+		Paint paint = new Paint();
+		
+		private int cropX1, cropX2, cropY1, cropY2 = 0;
+		
 	    public Panel(Context context) {
 	        super(context);
+	        getHolder().addCallback(this);
+	        thread = new PanelThread(getHolder(), this);
+	        
+	        cropX1 = 200;
+	        cropX2 = cropX1 + 150;
+	        cropY1 = 200;
+	        cropY2 = cropY1 + 150;
 	    }
 	 
 	    @Override
 	    public void onDraw(Canvas canvas) {
+	    	//"clear" canvas
+	    	canvas.drawColor(Color.BLACK);
+	    	
             canvas.drawBitmap(photo, 10, 10, null);
-            //photo.get
+           
+            paint.setColor(Color.YELLOW);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(3);
+            canvas.drawRect(cropX1, cropY1, cropX2, cropY2, paint);
+         
+	    }
+	    
+		@Override
+		public boolean onTouchEvent(MotionEvent event) {
+			
+			int eX = (int) event.getX();
+			int eY = (int) event.getY();
+			
+			//check if the touch was out of the picture
+			
+			//check right bounty
+			if((eX - ((cropX2-cropX1)/2)) >= 0 || (eY - ((cropY2 - cropY1)/2)) >= 0){
+				if((eX + ((cropX2-cropX1)/2)) <= photo.getWidth() || (eY + ((cropY2 - cropY1)/2)) <= photo.getHeight()){
+					cropX1 = eX - ((cropX2-cropX1)/2);
+			        cropX2 = cropX1 + 150;
+			        cropY1 = eY - ((cropY2 - cropY1)/2);
+			        cropY2 = cropY1 + 150;
+				}
+			}
+			
+			return true;
+		}
+
+		public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void surfaceCreated(SurfaceHolder holder) {
+			thread.setRunning(true);
+			thread.start();
+			
+		}
+
+		public void surfaceDestroyed(SurfaceHolder holder) {
+			boolean retry = true;
+		    thread.setRunning(false);
+		    while (retry) {
+		        try {
+		            thread.join();
+		            retry = false;
+		        } catch (InterruptedException e) {
+		            e.printStackTrace();		        }
+		    }
+		}
+
+		public int getCropX1() {
+			return cropX1;
+		}
+
+		public void setCropX1(int cropX1) {
+			this.cropX1 = cropX1;
+		}
+
+		public int getCropX2() {
+			return cropX2;
+		}
+
+		public void setCropX2(int cropX2) {
+			this.cropX2 = cropX2;
+		}
+
+		public int getCropY1() {
+			return cropY1;
+		}
+
+		public void setCropY1(int cropY1) {
+			this.cropY1 = cropY1;
+		}
+
+		public int getCropY2() {
+			return cropY2;
+		}
+
+		public void setCropY2(int cropY2) {
+			this.cropY2 = cropY2;
+		}
+		
+		
+		
+	}
+	
+	/** PanelThread Class **/
+	
+	class PanelThread extends Thread {
+	    private SurfaceHolder _surfaceHolder;
+	    private Panel _panel;
+	    private boolean _run = false;
+	 
+	    public PanelThread(SurfaceHolder surfaceHolder, Panel panel) {
+	        _surfaceHolder = surfaceHolder;
+	        _panel = panel;
+	    }
+	 
+	    public void setRunning(boolean run) {
+	        _run = run;
+	    }
+	 
+	    @Override
+	    public void run() {
+	    	Canvas c;
+	        while (_run) {
+	            c = null;
+	            try {
+	                c = _surfaceHolder.lockCanvas(null);
+	                synchronized (_surfaceHolder) {
+	                    _panel.onDraw(c);
+	                }
+	            } finally {
+	                // do this in a finally so that if an exception is thrown
+	                // during the above, we don't leave the Surface in an
+	                // inconsistent state
+	                if (c != null) {
+	                    _surfaceHolder.unlockCanvasAndPost(c);
+	                }
+	            }
+	        }
 	    }
 	}
 	
