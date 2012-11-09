@@ -11,6 +11,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.Log;
 import android.view.Menu;
@@ -50,9 +51,25 @@ public class CropPic extends Activity implements OnTouchListener{
 		    ContentResolver cr = this.getContentResolver();
 		    try{
 		        photo = android.provider.MediaStore.Images.Media.getBitmap(cr, imgUri);
-		        photo = Bitmap.createScaledBitmap(photo, photo.getWidth()/4, photo.getHeight()/4, false);
-		    } catch (Exception e)
-		    {
+		        
+		        final float scale = getResources().getDisplayMetrics().density;
+				int bmpH = (int) (int) (420 * scale + 0.5f);
+		        int bmpW = (int) ((float)photo.getWidth() * (float)((float)bmpH/(float)photo.getHeight()));
+		        
+		        if(photo.getWidth() > photo.getHeight()){
+		        	float scaleWH = (float) bmpH / photo.getHeight();
+		        	
+		        	// create a matrix for the manipulation
+		            Matrix matrix = new Matrix();
+		            // resize the bit map
+		            matrix.postScale(scaleWH, scaleWH);
+		            // rotate the Bitmap
+		            matrix.postRotate(90);
+		            photo = Bitmap.createBitmap(photo, 0, 0, photo.getWidth(), photo.getHeight(), matrix, true);
+		        }else{
+		        	photo = Bitmap.createScaledBitmap(photo, bmpW, bmpH, false); 
+		        }
+		    } catch (Exception e) {
 		        Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
 		        Log.d("ImgURI", "Failed to load", e);
 		    }
@@ -115,7 +132,7 @@ public class CropPic extends Activity implements OnTouchListener{
 			
 			//check right bounty
 			if((eX - ((cropX2-cropX1)/2)) >= 0 || (eY - ((cropY2 - cropY1)/2)) >= 0){
-				if((eX + ((cropX2-cropX1)/2)) <= photo.getWidth() || (eY + ((cropY2 - cropY1)/2)) <= photo.getHeight()){
+				if((eX + ((cropX2-cropX1)/2)) <= photo.getWidth() || (eY + ((cropY2 + cropY1)/2)) <= photo.getHeight()){
 					cropX1 = eX - ((cropX2-cropX1)/2);
 			        cropX2 = cropX1 + 150;
 			        cropY1 = eY - ((cropY2 - cropY1)/2);

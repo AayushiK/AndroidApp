@@ -16,6 +16,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -111,7 +112,26 @@ public class Camera extends Activity implements View.OnClickListener {
 		    ContentResolver cr = this.getContentResolver();
 		    try{
 		        bmp = android.provider.MediaStore.Images.Media.getBitmap(cr, mImageCaptureUri1);
-		        display.setImageBitmap(Bitmap.createScaledBitmap(bmp, bmp.getWidth()/2, bmp.getHeight()/2, false));
+		        
+		        final float scale = getResources().getDisplayMetrics().density;
+		        int bmpH = (int) ((380 - 0.5f) / scale);
+		        int bmpW = (int) ((float)bmp.getWidth() * ((float)bmpH/(float)bmp.getHeight()));   
+		        
+		        //check if the image needs to be rotated
+		  
+		        if(bmp.getWidth() > bmp.getHeight()){
+		        	float scaleWH = (float) bmpH / bmp.getHeight();
+		        	
+		        	// create a matrix for the manipulation
+		            Matrix matrix = new Matrix();
+		            // resize the bit map
+		            matrix.postScale(scaleWH, scaleWH);
+		            // rotate the Bitmap
+		            matrix.postRotate(90);
+		            display.setImageBitmap(Bitmap.createBitmap(bmp, 0, 0, bmp.getWidth(), bmp.getHeight(), matrix, true));
+		        }else{
+			        display.setImageBitmap(Bitmap.createScaledBitmap(bmp, bmpW, bmpH, false));
+		        }
 		    } catch (Exception e){
 		        Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
 		        Log.d("ImgURI", "Failed to load", e);

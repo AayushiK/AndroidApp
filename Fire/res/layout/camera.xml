@@ -1,31 +1,30 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_weight = "100" >
 
     <ImageView
         android:id="@+id/photo_display"
         android:layout_width="fill_parent"
-        android:layout_height="380dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+        android:layout_height="0dip"
+        android:layout_weight="76"
         android:src="@drawable/fire" />
 
     <Button
         android:id="@+id/done_btn"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="12"
         android:text="@string/okay" />
 
     <Button
         android:id="@+id/retake_btn"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/done_btn"
-        android:layout_below="@+id/photo_display"
+        android:layout_width="fill_parent"
+        android:layout_height="0dip"
+        android:layout_weight="12"
         android:layout_marginTop="5dp"
         android:text="@string/retake_pic" />
 
-</RelativeLayout>
+</LinearLayout>
