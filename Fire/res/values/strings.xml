@@ -17,5 +17,6 @@
     <string name="done">Done</string>
     <string name="okay">Okay</string>
     <string name="title_activity_crop_pic">CropPic</string>
+    <string name="title_activity_burn_doll">BurnDoll</string>
 
 </resources>

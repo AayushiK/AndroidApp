@@ -1,5 +1,6 @@
 package pkg.camera;
 
+import pkg.fire.BurnDoll;
 import pkg.fire.R;
 import pkg.fire.R.layout;
 import pkg.fire.R.menu;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -78,10 +80,22 @@ public class CropPic extends Activity implements OnTouchListener{
 			
         }
         
-        Panel sv = new Panel(this);
+        sv = new Panel(this);
         sv.setOnTouchListener(this);
         layout.addView(sv, params);
         
+        cropDone = (Button) findViewById(R.id.cropDoneBtn);
+        cropDone.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Bitmap croppedImage = Bitmap.createBitmap(photo, 
+						sv.getCropX1(), sv.getCropY1(), 
+						sv.getCropX2()-sv.getCropX1(), sv.getCropY2()-sv.getCropY1());
+				Intent i = new Intent(CropPic.this, BurnDoll.class);
+				i.putExtra("picture", croppedImage);
+				startActivity(i);
+				finish();
+			}
+		});        
     }
 
     @Override
