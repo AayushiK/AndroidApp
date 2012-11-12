@@ -50,34 +50,36 @@ public class Camera extends Activity implements View.OnClickListener {
         retakeBtn.setOnClickListener(this);
         doneBtn.setOnClickListener(this);
         
-        Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-        
-        File photo;
-        try{
-            // place where to store camera taken picture
-            photo = this.createTemporaryFile("picture", ".jpg");
-            photo.delete();
-        }catch(Exception e){
-            Log.v("CreateTempFile", "Can't create file to take picture!");
-            Toast.makeText(this, "Please check SD card! Image shot is impossible!", Toast.LENGTH_LONG).show();
-            return;
-        }
-        
-        mImageCaptureUri1 = Uri.fromFile(photo);
-        i.putExtra(MediaStore.EXTRA_OUTPUT, mImageCaptureUri1);
-        //start camera intent
-        startActivityForResult(i, CAMERA_CAPTURE);
-     
+        startCamera();
+            
     }
 
+    
+    private void startCamera(){
+    	 Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+
+    	 File photo;
+         try{
+             // place where to store camera taken picture
+             photo = this.createTemporaryFile("picture", ".jpg");
+             photo.delete();
+         }catch(Exception e){
+             Log.v("CreateTempFile", "Can't create file to take picture!");
+             Toast.makeText(this, "Please check SD card! Image shot is impossible!", Toast.LENGTH_LONG).show();
+             return;
+         }
+         
+         mImageCaptureUri1 = Uri.fromFile(photo);
+         i.putExtra(MediaStore.EXTRA_OUTPUT, mImageCaptureUri1);
+         //start camera intent
+         startActivityForResult(i, CAMERA_CAPTURE);
+    }
     
     private File createTemporaryFile(String part, String ext) throws Exception{
         File tempDir= Environment.getExternalStorageDirectory();
         tempDir=new File(tempDir.getAbsolutePath()+"/.temp/");
         if(!tempDir.exists())
-        {
             tempDir.mkdir();
-        }
         return File.createTempFile(part, ext, tempDir);
     }
     
@@ -97,8 +99,8 @@ public class Camera extends Activity implements View.OnClickListener {
 			startActivity(cropIntent);
 			break;
 		case R.id.retake_btn:
-			Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-			startActivityForResult(i, CAMERA_CAPTURE);
+			bmp.recycle();
+			startCamera();
 			break;
 		}
 		

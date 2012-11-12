@@ -32,16 +32,18 @@ public class CropPic extends Activity implements OnTouchListener{
 	Bitmap photo;
 	Uri imgUri;
 	
+	private float scale;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
       
         setContentView(R.layout.crop_pic);
+        scale = getResources().getDisplayMetrics().density;
+        
         LinearLayout layout = (LinearLayout) findViewById(R.id.cropViewLayout);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        Panel sv = new Panel(this);
-        sv.setOnTouchListener(this);
-        layout.addView(sv, params);
+       
           
         if(getIntent().getExtras()!=null){
         //	photo  = (Bitmap) getIntent().getParcelableExtra("photo");
@@ -52,11 +54,9 @@ public class CropPic extends Activity implements OnTouchListener{
 		    try{
 		        photo = android.provider.MediaStore.Images.Media.getBitmap(cr, imgUri);
 		        
-		        final float scale = getResources().getDisplayMetrics().density;
-				int bmpH = (int) (int) (420 * scale + 0.5f);
-		        int bmpW = (int) ((float)photo.getWidth() * (float)((float)bmpH/(float)photo.getHeight()));
-		        
 		        if(photo.getWidth() > photo.getHeight()){
+		        	int bmpW = (int) (390 * scale + 0.5f);
+			        int bmpH = (int) ((float)photo.getHeight() * (float)((float)bmpW/(float)photo.getWidth()));
 		        	float scaleWH = (float) bmpH / photo.getHeight();
 		        	
 		        	// create a matrix for the manipulation
@@ -67,6 +67,8 @@ public class CropPic extends Activity implements OnTouchListener{
 		            matrix.postRotate(90);
 		            photo = Bitmap.createBitmap(photo, 0, 0, photo.getWidth(), photo.getHeight(), matrix, true);
 		        }else{
+		        	int bmpH = (int) (390 * scale + 0.5f);
+			        int bmpW = (int) ((float)photo.getWidth() * (float)((float)bmpH/(float)photo.getHeight()));
 		        	photo = Bitmap.createScaledBitmap(photo, bmpW, bmpH, false); 
 		        }
 		    } catch (Exception e) {
@@ -75,6 +77,10 @@ public class CropPic extends Activity implements OnTouchListener{
 		    }
 			
         }
+        
+        Panel sv = new Panel(this);
+        sv.setOnTouchListener(this);
+        layout.addView(sv, params);
         
     }
 
@@ -86,6 +92,10 @@ public class CropPic extends Activity implements OnTouchListener{
 
 	public boolean onTouch(View arg0, MotionEvent arg1) {
 		return false;
+	}
+	
+	public int dpToPixel(int dp){
+		return (int) (dp * scale + 0.5f);
 	}
 	
 	/*** PANEL CLASS ***/
@@ -102,10 +112,10 @@ public class CropPic extends Activity implements OnTouchListener{
 	        getHolder().addCallback(this);
 	        thread = new PanelThread(getHolder(), this);
 	        
-	        cropX1 = 200;
-	        cropX2 = cropX1 + 150;
-	        cropY1 = 200;
-	        cropY2 = cropY1 + 150;
+	        cropX1 = dpToPixel(photo.getHeight()/2 - dpToPixel(100)/2);
+	        cropX2 = cropX1 + dpToPixel(100);
+	        cropY1 = dpToPixel(photo.getWidth()/2 - dpToPixel(100)/2);
+	        cropY2 = cropY1 + dpToPixel(100);
 	    }
 	 
 	    @Override
@@ -113,7 +123,7 @@ public class CropPic extends Activity implements OnTouchListener{
 	    	//"clear" canvas
 	    	canvas.drawColor(Color.BLACK);
 	    	
-            canvas.drawBitmap(photo, 10, 10, null);
+            canvas.drawBitmap(photo, 0, 0, null);
            
             paint.setColor(Color.YELLOW);
             paint.setStyle(Paint.Style.STROKE);
@@ -129,16 +139,24 @@ public class CropPic extends Activity implements OnTouchListener{
 			int eY = (int) event.getY();
 			
 			//check if the touch was out of the picture
-			
-			//check right bounty
-			if((eX - ((cropX2-cropX1)/2)) >= 0 || (eY - ((cropY2 - cropY1)/2)) >= 0){
-				if((eX + ((cropX2-cropX1)/2)) <= photo.getWidth() || (eY + ((cropY2 + cropY1)/2)) <= photo.getHeight()){
-					cropX1 = eX - ((cropX2-cropX1)/2);
-			        cropX2 = cropX1 + 150;
-			        cropY1 = eY - ((cropY2 - cropY1)/2);
-			        cropY2 = cropY1 + 150;
-				}
+			if((eX - ((cropX2-cropX1)/2)) < 0){
+				cropX1 = 0;
+			}else if(eX + ((cropX2-cropX1)/2) > photo.getWidth()){
+				cropX1 = photo.getWidth() - (cropX2-cropX1);
+			}else{
+				cropX1 = eX - ((cropX2-cropX1)/2);
 			}
+			
+			if(eY - ((cropY2 - cropY1)/2) < 0){
+				cropY1 = 0;
+			}else if(eY + ((cropY2 - cropY1)/2) > photo.getHeight()){
+				cropY1 = photo.getHeight() - (cropY2-cropY1);
+			}else{
+				cropY1 = eY - ((cropY2 - cropY1)/2);
+			}
+			
+			cropX2 = cropX1 + dpToPixel(100);
+			cropY2 = cropY1 + dpToPixel(100);
 			
 			return true;
 		}
