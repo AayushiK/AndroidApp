@@ -23,6 +23,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
@@ -31,6 +32,7 @@ public class CropPic extends Activity implements OnTouchListener{
 
 	Panel sv;
 	Button cropDone;
+	ImageButton incCrop, decCrop;
 	Bitmap photo;
 	Uri imgUri;
 	
@@ -95,7 +97,22 @@ public class CropPic extends Activity implements OnTouchListener{
 				startActivity(i);
 				finish();
 			}
-		});        
+		});
+        
+        //set crop size adjusting buttons
+        incCrop = (ImageButton) findViewById(R.id.rzBiggerBtn);
+        decCrop = (ImageButton) findViewById(R.id.rzSmallerBtn);
+        incCrop.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				sv.incCropSize();
+			}
+		});
+        decCrop.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				sv.decCropSize();
+			}
+		});
+        
     }
 
     @Override
@@ -120,16 +137,17 @@ public class CropPic extends Activity implements OnTouchListener{
 		Paint paint = new Paint();
 		
 		private int cropX1, cropX2, cropY1, cropY2 = 0;
+		private int cropSize = 100;
 		
 	    public Panel(Context context) {
 	        super(context);
 	        getHolder().addCallback(this);
 	        thread = new PanelThread(getHolder(), this);
 	        
-	        cropX1 = dpToPixel(photo.getHeight()/2 - dpToPixel(100)/2);
-	        cropX2 = cropX1 + dpToPixel(100);
-	        cropY1 = dpToPixel(photo.getWidth()/2 - dpToPixel(100)/2);
-	        cropY2 = cropY1 + dpToPixel(100);
+	        cropX1 = dpToPixel(photo.getHeight()/2 - dpToPixel(cropSize)/2);
+	        cropX2 = cropX1 + dpToPixel(cropSize);
+	        cropY1 = dpToPixel(photo.getWidth()/2 - dpToPixel(cropSize)/2);
+	        cropY2 = cropY1 + dpToPixel(cropSize);
 	    }
 	 
 	    @Override
@@ -152,25 +170,11 @@ public class CropPic extends Activity implements OnTouchListener{
 			int eX = (int) event.getX();
 			int eY = (int) event.getY();
 			
-			//check if the touch was out of the picture
-			if((eX - ((cropX2-cropX1)/2)) < 0){
-				cropX1 = 0;
-			}else if(eX + ((cropX2-cropX1)/2) > photo.getWidth()){
-				cropX1 = photo.getWidth() - (cropX2-cropX1);
-			}else{
-				cropX1 = eX - ((cropX2-cropX1)/2);
-			}
+			//moves the square and bounce it back from the boundary
+			boundaryBounce(eX, eY);
 			
-			if(eY - ((cropY2 - cropY1)/2) < 0){
-				cropY1 = 0;
-			}else if(eY + ((cropY2 - cropY1)/2) > photo.getHeight()){
-				cropY1 = photo.getHeight() - (cropY2-cropY1);
-			}else{
-				cropY1 = eY - ((cropY2 - cropY1)/2);
-			}
-			
-			cropX2 = cropX1 + dpToPixel(100);
-			cropY2 = cropY1 + dpToPixel(100);
+			cropX2 = cropX1 + dpToPixel(cropSize);
+			cropY2 = cropY1 + dpToPixel(cropSize);
 			
 			return true;
 		}
@@ -230,7 +234,50 @@ public class CropPic extends Activity implements OnTouchListener{
 			this.cropY2 = cropY2;
 		}
 		
+		public int getCropSize(){
+			return cropSize;
+		}
 		
+		public void setCropSize(int sz){
+			this.cropSize = sz;
+		}
+		
+		public void incCropSize(){
+			if(cropSize + dpToPixel(10) < photo.getWidth() && cropSize + dpToPixel(10) < photo.getHeight()){
+				cropSize += dpToPixel(10);
+				
+				boundaryBounce(cropX1 + cropSize/2, cropY1 + cropSize/2);
+				cropX2 = cropX1 + cropSize;
+				cropY2 = cropY1 + cropSize;
+			}
+		}
+		
+		public void decCropSize(){
+			if(cropSize - dpToPixel(10) > dpToPixel(50)){
+				cropSize -= dpToPixel(10);
+				cropX2 = cropX1 + cropSize;
+				cropY2 = cropY1 + cropSize;
+			}
+		}
+		
+		public void boundaryBounce(int eX, int eY){
+			//check if the touch was out of the picture
+			if((eX - (cropSize/2)) < 0){
+				cropX1 = 0;
+			}else if(eX + (cropSize/2) > photo.getWidth()){
+				cropX1 = photo.getWidth() - cropSize;
+			}else{
+				cropX1 = eX - (cropSize/2);
+			}
+			
+			if(eY - (cropSize/2) < 0){
+				cropY1 = 0;
+			}else if(eY + (cropSize/2) > photo.getHeight()){
+				cropY1 = photo.getHeight() - cropSize;
+			}else{
+				cropY1 = eY - (cropSize/2);
+			}
+		}
 		
 	}
 	
