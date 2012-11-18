@@ -37,8 +37,8 @@ public final class R {
         public static final int photo_display=0x7f080001;
         public static final int picDisplay=0x7f080000;
         public static final int retake_btn=0x7f080003;
-        public static final int rzBiggerBtn=0x7f080008;
-        public static final int rzSmallerBtn=0x7f080007;
+        public static final int rzBiggerBtn=0x7f080007;
+        public static final int rzSmallerBtn=0x7f080008;
         public static final int settingBtn=0x7f08000c;
         public static final int startBtn=0x7f08000b;
         public static final int titleImg=0x7f08000a;

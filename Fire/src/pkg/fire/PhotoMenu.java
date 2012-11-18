@@ -51,6 +51,8 @@ public class PhotoMenu extends Activity implements OnClickListener{
 			startActivity(cam);
 			break;
 		case R.id.DefaultButton:
+			Intent defaultI = new Intent(PhotoMenu.this, pkg.doll.OpenGLES20Complete.class);
+			startActivity(defaultI);
 			break;
 		
 		}
