@@ -137,17 +137,17 @@ public class CropPic extends Activity implements OnTouchListener{
 		Paint paint = new Paint();
 		
 		private int cropX1, cropX2, cropY1, cropY2 = 0;
-		private int cropSize = 100;
+		private int cropSize;
 		
 	    public Panel(Context context) {
 	        super(context);
 	        getHolder().addCallback(this);
 	        thread = new PanelThread(getHolder(), this);
-	        
-	        cropX1 = dpToPixel(photo.getHeight()/2 - dpToPixel(cropSize)/2);
-	        cropX2 = cropX1 + dpToPixel(cropSize);
-	        cropY1 = dpToPixel(photo.getWidth()/2 - dpToPixel(cropSize)/2);
-	        cropY2 = cropY1 + dpToPixel(cropSize);
+	        cropSize = dpToPixel(100);
+	        cropX1 = photo.getHeight()/2 - cropSize/2;
+	        cropX2 = cropX1 + cropSize;
+	        cropY1 = photo.getWidth()/2 - cropSize/2;
+	        cropY2 = cropY1 + cropSize;
 	    }
 	 
 	    @Override
@@ -173,8 +173,8 @@ public class CropPic extends Activity implements OnTouchListener{
 			//moves the square and bounce it back from the boundary
 			boundaryBounce(eX, eY);
 			
-			cropX2 = cropX1 + dpToPixel(cropSize);
-			cropY2 = cropY1 + dpToPixel(cropSize);
+			cropX2 = cropX1 + cropSize;
+			cropY2 = cropY1 + cropSize;
 			
 			return true;
 		}
