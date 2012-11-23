@@ -1,6 +1,8 @@
 package pkg.fire;
 
 import pkg.camera.Camera;
+import pkg.camera.CropPic;
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -15,6 +17,9 @@ public class PhotoMenu extends Activity implements OnClickListener{
 	Button cameraBtn;
 	Button albumBtn;
 	Button returnBtn;
+	
+	//Result
+	final static int PICK_IMAGE = 0;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +46,8 @@ public class PhotoMenu extends Activity implements OnClickListener{
 	public void onClick(View v) {
 		switch(v.getId()){
 		case R.id.AlbumButton:
+			Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+			startActivityForResult(intent, 0);
 			break;
 		case R.id.BackButton:
 			Intent i = new Intent(PhotoMenu.this, MainMenu.class);
@@ -58,6 +65,19 @@ public class PhotoMenu extends Activity implements OnClickListener{
 		}
 		
 	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == PICK_IMAGE && resultCode == RESULT_OK){
+			Uri targetUri = data.getData();
+			Intent cropIntent = new Intent(PhotoMenu.this, CropPic.class);
+			cropIntent.putExtra("photoUri", targetUri);
+			startActivity(cropIntent);
+		}
+		
+	}
+	
 	
 	
 }
