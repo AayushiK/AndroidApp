@@ -16,15 +16,24 @@
 
 package pkg.doll;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Scanner;
+
+import pkg.fire.R;
 import android.app.Activity;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 
 public class OpenGLES20Complete extends Activity {
 
     private GLSurfaceView mGLView;
+    private float triangleCoords[];
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,7 +41,38 @@ public class OpenGLES20Complete extends Activity {
 
         // Create a GLSurfaceView instance and set it
         // as the ContentView for this Activity
-        mGLView = new MyGLSurfaceView(this);
+
+        try{
+	    	InputStream is = getResources().openRawResource(R.raw.vertexdata1);
+	    	BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+	    	Scanner scanFile = new Scanner(reader);
+	    	
+	    	float num;
+	    	int count = 0;
+	    	while (scanFile.hasNext()){
+	    		scanFile.next();
+	    		count++;
+	    	}
+	    	
+	    	triangleCoords = new float[count--];
+	    	count = 0;
+			is.close();
+			reader.close();
+			
+	    	InputStream is2 = getResources().openRawResource(R.raw.vertexdata1);
+	    	BufferedReader reader2 = new BufferedReader(new InputStreamReader(is2));
+	    	scanFile = new Scanner(reader2);
+	    	while (scanFile.hasNext()){
+	    		num = scanFile.nextFloat();
+	    		triangleCoords[count++] = num;
+	    	}
+	    	is2.close();
+	    	reader2.close();
+        } catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+        mGLView = new MyGLSurfaceView(this, triangleCoords);
         setContentView(mGLView);
     }
 
@@ -60,14 +100,13 @@ class MyGLSurfaceView extends GLSurfaceView {
 
     private final MyGLRenderer mRenderer;
 
-    public MyGLSurfaceView(Context context) {
+    public MyGLSurfaceView(Context context, float triangleCoords[]) {
         super(context);
 
         // Create an OpenGL ES 2.0 context.
         setEGLContextClientVersion(2);
-
         // Set the Renderer for drawing on the GLSurfaceView
-        mRenderer = new MyGLRenderer(context);
+        mRenderer = new MyGLRenderer(triangleCoords);
         setRenderer(mRenderer);
 
         // Render the view only when there is a change in the drawing data

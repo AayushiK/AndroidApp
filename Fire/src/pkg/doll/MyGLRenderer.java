@@ -40,7 +40,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
 
     private static final String TAG = "MyGLRenderer";
     private Triangle mTriangle;
-    Context context;
+    private float triangleCoords[];
    
     private final float[] mMVPMatrix = new float[16];
     private final float[] mProjMatrix = new float[16];
@@ -50,21 +50,17 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     // Declare as volatile because we are updating it from another thread
     public volatile float mAngle;
     
-    public MyGLRenderer (Context context){
-    	this.context = context;
+    public MyGLRenderer (float triangleCoords[]){
+    	this.triangleCoords = triangleCoords;
     }
 
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         // Set the background frame color
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        try
-        {
-        	mTriangle = new Triangle(context);
-        }
-        catch(Exception fe)
-        {
-        	System.out.println("File not found\n");
+        try{
+        	mTriangle = new Triangle(triangleCoords);
+        }catch(Exception fe){
         	Log.e("onsurfacecreate", fe.toString());
         }
       
@@ -177,58 +173,7 @@ class Triangle {
     // Set color with red, green, blue and alpha (opacity) values
     float color[] = { 0.63671875f, 0.76953125f, 0.22265625f, 1.0f };
 
-    public Triangle(Context context) throws FileNotFoundException, IOException{
-    	
-    	AssetManager am = context.getAssets();
-    	//InputStream is = am.open("VertexData1.txt");
-    	InputStream is = context.getResources().openRawResource(R.raw.vertexdata1);
-    /*	Scanner scanFile = new Scanner(new File("VertexData1.txt"));
-    	int num, count = 0;
-    	while (scanFile.hasNext())
-    	{
-    		num = scanFile.nextInt();
-    		count++;
-    	}
-    	float triangleCoords[] = new float[count--];
-    	count = 0;
-    	while (scanFile.hasNext())
-    	{
-    		num = scanFile.nextInt();
-    		triangleCoords[count++] = num;
-    	}*/
-    	
-    	BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-    	Scanner scanFile = new Scanner(reader);
-    	
-    	Log.i("HHH", "Reached here...00_O");
-    	
-    	float num;
-    	int count = 0;
-    	while (scanFile.hasNext()){
-    		//num = scanFile.nextFloat();
-    		scanFile.next();
-    		count++;
-    	}
-    	
-    	Log.i("HHH", "Reached here...1v: "  + count);
-    	
-    	float triangleCoords[] = new float[count--];
-    	count = 0;
-    	is.close();
-    	is = context.getResources().openRawResource(R.raw.vertexdata1);
-    	BufferedReader reader2 = new BufferedReader(new InputStreamReader(is));
-    	scanFile = new Scanner(reader2);
-    	while (scanFile.hasNext()){
-    		num = scanFile.nextFloat();
-    		triangleCoords[count++] = num;
-    		Log.i("lo", "lolmo: " + count);
-    	}
-    	
-    	is.close();
-    	reader.close();
-    	reader2.close();
-    	
-    	Log.i("HHH", "Reached here...");
+    public Triangle(float[] triangleCoords) throws FileNotFoundException, IOException{
     	
     	vertexCount = triangleCoords.length / COORDS_PER_VERTEX;
     	vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
