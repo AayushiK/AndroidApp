@@ -61,7 +61,7 @@ class ClearRenderer implements GLSurfaceView.Renderer
     public ClearRenderer(Context context, ClearGLSurfaceView view)  
     {  
         this.view = view;  
-        model = new DrawModel(context.getResources().getXml(R.xml.sphere));  
+        model = new DrawModel(context.getResources().getXml(R.xml.colorcube));  
     }  
   
     public void onSurfaceCreated(GL10 gl, EGLConfig config)  
