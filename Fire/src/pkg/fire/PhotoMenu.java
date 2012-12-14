@@ -2,6 +2,7 @@ package pkg.fire;
 
 import pkg.camera.Camera;
 import pkg.camera.CropPic;
+import pkg.doll.AndroidOgreMesh;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
@@ -58,7 +59,7 @@ public class PhotoMenu extends Activity implements OnClickListener{
 			startActivity(cam);
 			break;
 		case R.id.DefaultButton:
-			Intent defaultI = new Intent(PhotoMenu.this, pkg.doll.OpenGLES20Complete.class);
+			Intent defaultI = new Intent(PhotoMenu.this, AndroidOgreMesh.class);
 			startActivity(defaultI);
 			break;
 		

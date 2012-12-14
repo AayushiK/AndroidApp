@@ -51,6 +51,11 @@
             android:name="pkg.doll.OpenGLES20Complete"
             android:label="@string/app_name" >
         </activity>
+        
+        <activity
+            android:name="pkg.doll.AndroidOgreMesh"
+            android:label="@string/app_name" >
+        </activity>
     </application>
 
 </manifest>
