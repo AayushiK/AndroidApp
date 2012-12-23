@@ -47,11 +47,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     private final float[] mVMatrix = new float[16];
     private final float[] mRotationMatrix = new float[16];
     
-    float[] coords = null;  
-    float[] colcoords = null;  
-    short[] icoords = null;  
-    float[] ncoords = null; 
-
     // Declare as volatile because we are updating it from another thread
     public volatile float mAngle;
     
@@ -59,14 +54,6 @@ public class MyGLRenderer implements GLSurfaceView.Renderer {
     	this.triangleCoords = triangleCoords;
     }
 
-    public MyGLRenderer ( float[] coords, float[] colcoords, short[] icoords, float[] ncoords){
-    	this.coords = coords;
-    	this.colcoords = colcoords;
-    	this.icoords = icoords;
-    	this.ncoords = ncoords;
-    }
-    
-    
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         // Set the background frame color
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

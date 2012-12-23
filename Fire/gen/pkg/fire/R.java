@@ -89,6 +89,7 @@ public final class R {
         public static final int colorcube=0x7f040000;
         public static final int cone=0x7f040001;
         public static final int cone2=0x7f040002;
-        public static final int sphere=0x7f040003;
+        public static final int graphic=0x7f040003;
+        public static final int sphere=0x7f040004;
     }
 }
